@@ -3,16 +3,30 @@ resources:
     medallion_etl:
       name: medallion-etl
       tasks:
+        - task_key: bronze-ddl
+          notebook_task:
+            notebook_path: DDL/Bronze DDL
+            source: GIT
+          job_cluster_key: medallion-etl-cluster
         - task_key: bronze-loader
+          depends_on:
+            - task_key: bronze-ddl
           notebook_task:
             notebook_path: Bronze Loader
             base_parameters:
               as_of_date: 2010-07-13
             source: GIT
           job_cluster_key: medallion-etl-cluster
-        - task_key: silver-dim-loader
+        - task_key: silver-ddl
           depends_on:
             - task_key: bronze-loader
+          notebook_task:
+            notebook_path: DDL/Silver DDL
+            source: GIT
+          job_cluster_key: medallion-etl-cluster
+        - task_key: silver-dim-loader
+          depends_on:
+            - task_key: silver-ddl
           notebook_task:
             notebook_path: Silver Dim Loader
             source: GIT
@@ -24,9 +38,16 @@ resources:
             notebook_path: Silver Fact Loader
             source: GIT
           job_cluster_key: medallion-etl-cluster
-        - task_key: gold-loader
+        - task_key: Gold_DDL
           depends_on:
             - task_key: silver-fact-loader
+          notebook_task:
+            notebook_path: DDL/Gold DDL
+            source: GIT
+          job_cluster_key: medallion-etl-cluster
+        - task_key: gold-loader
+          depends_on:
+            - task_key: Gold_DDL
           notebook_task:
             notebook_path: Gold Loader
             source: GIT
