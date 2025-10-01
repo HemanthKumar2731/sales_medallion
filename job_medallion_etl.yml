@@ -7,7 +7,7 @@ resources:
           notebook_task:
             notebook_path: DDL/Bronze DDL
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: bronze-loader
           depends_on:
             - task_key: bronze-ddl
@@ -16,54 +16,42 @@ resources:
             base_parameters:
               as_of_date: 2010-07-13
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: silver-ddl
           depends_on:
             - task_key: bronze-loader
           notebook_task:
             notebook_path: DDL/Silver DDL
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: silver-dim-loader
           depends_on:
             - task_key: silver-ddl
           notebook_task:
             notebook_path: Silver Dim Loader
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: silver-fact-loader
           depends_on:
             - task_key: silver-dim-loader
           notebook_task:
             notebook_path: Silver Fact Loader
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: Gold_DDL
           depends_on:
             - task_key: silver-fact-loader
           notebook_task:
             notebook_path: DDL/Gold DDL
             source: GIT
-          job_cluster_key: medallion-etl-cluster
+            warehouse_id: 103aa213d78bb659
         - task_key: gold-loader
           depends_on:
             - task_key: Gold_DDL
           notebook_task:
             notebook_path: Gold Loader
             source: GIT
-          job_cluster_key: medallion-etl-cluster
-      job_clusters:
-        - job_cluster_key: medallion-etl-cluster
-          new_cluster:
-            cluster_name: ""
-            spark_version: 16.4.x-scala2.12
-            node_type_id: Standard_D4ds_v5
-            spark_env_vars:
-              PYSPARK_PYTHON: /databricks/python3/bin/python3
-            data_security_mode: LEGACY_SINGLE_USER_STANDARD
-            runtime_engine: PHOTON
-            kind: CLASSIC_PREVIEW
-            is_single_node: true
+            warehouse_id: 103aa213d78bb659
       git_source:
         git_url: https://github.com/HemanthKumar2731/sales_medallion
         git_provider: gitHub
