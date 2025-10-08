@@ -1,0 +1,84 @@
+resources:
+  jobs:
+    sales_etl:
+      name: sales_etl
+      tasks:
+        - task_key: bronze-ddl
+          email_notifications: {}
+          notebook_task:
+            notebook_path: DDL/Bronze DDL
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: bronze-loader
+          depends_on:
+            - task_key: bronze-ddl
+          email_notifications: {}
+          notebook_task:
+            base_parameters:
+              as_of_date: 2014-06-01
+            notebook_path: Bronze Loader
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: silver-ddl
+          depends_on:
+            - task_key: bronze-loader
+          email_notifications: {}
+          notebook_task:
+            notebook_path: DDL/Silver DDL
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: silver-dim-loader
+          depends_on:
+            - task_key: silver-ddl
+          email_notifications: {}
+          notebook_task:
+            notebook_path: Silver Dim Loader
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: gold-ddl
+          depends_on:
+            - task_key: silver-fact-loader
+          email_notifications: {}
+          notebook_task:
+            notebook_path: DDL/Gold DDL
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: gold-loader
+          depends_on:
+            - task_key: gold-ddl
+          email_notifications: {}
+          notebook_task:
+            notebook_path: Gold Loader
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+        - task_key: silver-fact-loader
+          depends_on:
+            - task_key: silver-dim-loader
+          email_notifications: {}
+          notebook_task:
+            notebook_path: Silver Fact Loader
+            source: GIT
+            warehouse_id: ${var.warehouse_id}
+          run_if: ALL_SUCCESS
+          webhook_notifications: {}
+      email_notifications: {}
+      git_source:
+        git_branch: main
+        git_provider: gitHub
+        git_url: https://github.com/HemanthKumar2731/sales_medallion
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      webhook_notifications: {}
